@@ -1,0 +1,22 @@
+#!/bin/bash
+
+read_logs() {
+	echo "$(journalctl -xeu scx_loader.service)"
+}
+
+if [ "$1" = "-l" ]; then
+	read_logs
+	exit 0
+fi
+
+conf=/etc/scx_loader.toml
+
+sudo vim $conf
+sudo systemctl restart scx_loader.service
+
+# self-backup
+cp $0 /home/igor/bin/
+cp $0 /home/igor/proj/my_cachyos_tuning/usr/bin/ || cp $0 /home/igor/
+cp $conf /home/igor/proj/my_cachyos_tuning/etc/ || cp $conf /home/igor/
+
+read_logs
