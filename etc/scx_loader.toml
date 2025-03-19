@@ -1,40 +1,66 @@
 #default_sched = "scx_lavd" # Edit this line to the scheduler you want scx_loader to start at boot
 #default_mode = "LowLatency" # Possible values: "Auto", "Gaming", "LowLatency", "PowerSave".
 
+# Default scheduler (активирован scx_rusty)
+default_sched = "scx_rusty"
+#default_sched = "scx_flash"
 #default_sched = "scx_bpfland"
-#default_sched = "scx_rusty"
-default_mode = "LowLatency"
+#default_sched = "scx_lavd"
+
+# Default mode (активен Gaming)
+default_mode = "Gaming"
+#default_mode = "Auto"
+#default_mode = "LowLatency"
+#default_mode = "PowerSave"
 #default_mode = "Server"
 
-# To apply:
-# $ systemctl restart scx_loader.service
-
 [scheds.scx_bpfland]
-auto_mode = []
-gaming_mode = ["-s", "10000", "-S", "1000", "-l", "10000", "-p", "-k"]
-lowlatency_mode = ["-s", "1600", "-S", "80", "-l", "35000"]
-powersave_mode = ["-s", "30000", "-S", "3000", "-l", "40000"]
-server_mode = ["-s", "60000", "-S", "20000", "-l", "6000", "-p", "-k", "-n"]
+auto_mode = ["-s", "20000", "-S", "1000", "-l", "20000"] 
+gaming_mode = ["-s", "5000", "-S", "500", "-l", "10000", "-p"]
+lowlatency_mode = ["-s", "3000", "-S", "100", "-l", "50000", "-k"]
+powersave_mode = ["-s", "40000", "-S", "4000", "-l", "50000", "-n"]
+server_mode = ["-s", "60000", "-S", "3000", "-l", "20000", "-k", "-f"]
 
 [scheds.scx_rusty]
 auto_mode = []
-gaming_mode = ["-u", "10000", "-o", "1000", "-g", "1", "-D", "90.0", "-K", "100.0"]
-#lowlatency_mode = ["-u", "5000", "-o", "500", "-g", "1", "-D", "90.0", "-K", "100.0"]
-lowlatency_mode = ["-u", "8000", "-o", "250", "-g", "1", "-D", "94.0", "-K", "970.0", "-I", "0.06"]
-powersave_mode = ["-u", "20000", "-o", "2000", "-g", "0", "-D", "50.0", "-K", "50.0"]
-server_mode = ["-f", "-u", "20000", "-o", "2000", "-g", "1", "-D", "90.0", "-K", "100.0"]
+gaming_mode = [
+    "-u", "10000",  # Оптимально для UE4/Mass Effect
+    "-o", "500",     # Burst-обработка Gradle
+    "-g", "1",       # Приоритет Vulkan-процессам
+    "-D", "85.0",    # Динамическое троттлинг AS-фонов
+    "-K", "110.0",   # Агрессивный boost активного окна
+    "-I", "0.04",    # Ускоренное переключение контекста
+    #"--mempolicy-affinity",  # Для NUMA-aware сборок
+    "--perf", "768"  # Смешанный CPU профиль
+]
+lowlatency_mode = [
+    "-u", "6000", "-o", "150",
+    "-g", "1", "-D", "96.5", "-K", "990.0",
+    "-I", "0.03", "--perf", "1024"
+]
+powersave_mode = [
+    "-u", "22000",
+    "-o", "2500",
+    "-g", "0",       # Сохраняем GPU доступ
+    "-D", "40.0",
+    "-K", "50.0",
+    "--perf", "256"  # Лимитированное энергопотребление
+]
+server_mode = [
+    "-f", "-u", "30000", "-o", "5000",
+    "-g", "2", "-D", "95.5", "-K", "150.0"
+]
 
 [scheds.scx_lavd]
 auto_mode = ["--autopilot"]
-gaming_mode = ["--performance", "--slice-max-us", "5000", "--slice-min-us", "300"]
-#lowlatency_mode = ["--performance", "--slice-max-us", "3000", "--slice-min-us", "100"]
-lowlatency_mode = ["--performance", "--slice-max-us", "180", "--slice-min-us", "50"]
-powersave_mode = ["--powersave", "--slice-max-us", "10000", "--slice-min-us", "500"]
-server_mode = ["--performance", "--slice-max-us", "80000", "--slice-min-us", "20000"]
+gaming_mode = ["--performance", "--slice-max-us", "2500", "--slice-min-us", "200"]
+lowlatency_mode = ["--performance", "--slice-max-us", "80", "--slice-min-us", "20"]
+powersave_mode = ["--powersave", "--slice-max-us", "20000", "--slice-min-us", "1000"]
+server_mode = ["--balanced", "--slice-max-us", "100000", "--slice-min-us", "50000"]
 
 [scheds.scx_flash]
-auto_mode = []
-gaming_mode = ["-s", "10000", "-l", "12500", "-u"]
-lowlatency_mode = ["-s", "5000", "-l", "26700", "-u"]  # Увеличено значение -l
-powersave_mode = ["-s", "20000", "-l", "10000"]
-server_mode = ["-s", "20000", "-l", "-12500", "-k", "-u"]
+gaming_mode = ["-s", "8000", "-l", "10000", "-u"]
+lowlatency_mode = ["-s", "3000", "-l", "35000", "-u"] 
+powersave_mode = ["-s", "30000", "-l", "8000"]
+server_mode = ["-s", "50000", "-l", "-20000", "-k", "-u"]
+
